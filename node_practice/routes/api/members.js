@@ -29,6 +29,7 @@ router.post("/", (request, response) => {
 
     members.push(newMember)
     response.json(members)
+    // response.redirect("/")
 })
 
 // Update Member

@@ -1,34 +1,31 @@
 const express = require("express")
 const path = require("path")
-const logger = require("./logger")
+const dotenv = require("dotenv")
 const exphbs = require("express-handlebars")
-const members = require("./Members")
+const connectDB = require("./config/db")
+
+// Load environment variables
+dotenv.config({path: "./config/config.env"})
+
+// Connect to DB
+connectDB()
+
+// Route files
+const members = require("./routes/api/members")
 
 const app = express()
 
-// app.use(logger)
-
-// Handlebars Middleware
-app.engine("handlebars", exphbs({defaultLayout: "main"}))
-app.set("view engine", "handlebars")
-
-// Homepage Route
-app.get("/", (request, response) => {
-    response.render("index", {
-        title: "Member App",
-        members
-    })
-})
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 // Body Parser Middleware
 app.use(express.json())
-app.use(express.urlencoded({extended: false}))
 
-// Set Static Folder
-app.use(express.static(path.join(__dirname, "public")))
-
-// Members API Routes
-app.use("/api/members", require("./routes/api/members"))
+// Mount Routers
+app.use("/api/members", members)
 
 const PORT = process.env.PORT || 5000
 

@@ -7,7 +7,7 @@ const Member = require("../models/Member")
 exports.getMembers = async (request, response, next) => {
     try {
         const members = await Member.find()
-        response.status(200).json({success: true, data: members})
+        response.status(200).json({success: true, count: members.length, data: members})
     } catch (error) {
         response.status(400).json({success: false})
     }
@@ -52,14 +52,35 @@ exports.createMember = async (request, response, next) => {
 // @route PUT /api/members/:id
 // @access Private
 
-exports.updateMember = (request, response, next) => {
-    response.status(200).json({success: true, msg: `Update member ${request.params.id}`})
+exports.updateMember = async (request, response, next) => {
+    try {
+        const member = await Member.findByIdAndUpdate(request.params.id, request.body, {
+            new: true,
+            runValidators: true
+        })
+    
+        if (!member) {
+            return response.status(400).json({success: false})
+        }
+        response.status(200).json({success: true, data: member})
+    } catch (error) {
+        response.status(400).json({success: false})
+    }
 }
 
 // @description Delete member
 // @route DELETE /api/members/:id
 // @access Private
 
-exports.deleteMember = (request, response, next) => {
-    response.status(200).json({success: true, msg: `Delete member ${request.params.id}`})
+exports.deleteMember = async (request, response, next) => {
+    try {
+        const member = await Member.findByIdAndDelete(request.params.id)
+    
+        if (!member) {
+            return response.status(400).json({success: false})
+        }
+        response.status(200).json({success: true, data: {}})
+    } catch (error) {
+        response.status(400).json({success: false})
+    }
 }

@@ -1,7 +1,6 @@
 const express = require("express")
 const path = require("path")
 const dotenv = require("dotenv")
-const exphbs = require("express-handlebars")
 const connectDB = require("./config/db")
 
 // Load environment variables

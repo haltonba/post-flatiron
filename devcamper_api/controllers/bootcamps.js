@@ -1,3 +1,4 @@
+const geocoder = require("../utils/geocoder")
 const Bootcamp = require("../models/Bootcamp")
 const ErrorResponse = require("../utils/errorResponse")
 const asyncHandler = require("../middleware/async")
@@ -63,4 +64,33 @@ exports.deleteBootcamp = asyncHandler(async (request, response, next) => {
         return next(new ErrorResponse(`Bootcamp not found with id of ${request.params.id}`, 404))
     }
     response.status(200).json({success: true, data: {}})
+})
+
+// @description Get bootcamps within a certain mile radius
+// @route GET /api/v1/bootcamps/:radius/:zipcode/:distance
+// @access Private
+
+exports.getBootcampsInRadius = asyncHandler(async (request, response, next) => {
+    const {zipcode, distance} = request.params
+
+    // Get latitude/logitude from geocoder
+    const loc = await geocoder.geocode(zipcode)
+    const lng = loc[0].longitude
+    const lat = loc[0].latitude
+
+    // Calculate radius using radians
+    // Divide distance by radius of the earth
+    // Earth radius = 3,963mi
+
+    const radius = distance / 3963
+
+    const bootcamps = await Bootcamp.find({
+        location: {$geoWithin: {$centerSphere: [[lng, lat], radius]}}
+    })
+    
+    response.status(200).json({
+        success: true,
+        count: bootcamps.length,
+        data: bootcamps
+    })
 })

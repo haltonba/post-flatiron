@@ -11,13 +11,65 @@ exports.getBootcamps = asyncHandler(async (request, response, next) => {
     // Original find all bootcamps
     // const bootcamps = await Bootcamp.find(request.query)
 
-    // Find bootcamps by cost
-    let query
-    let queryStr = JSON.stringify(request.query)
+    // Copy request.query
+    const requestQuery = {...request.query}
+
+    // Fields to exclude
+    const removeFields = ["select", "sort", "page", "limit"]
+
+    // Loop over removeFields and delete them from requestQuery
+    removeFields.forEach(param => delete requestQuery[param])
+
+    // Create query string
+    let queryStr = JSON.stringify(requestQuery)
+
+    // Create operators
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
-    query = Bootcamp.find(JSON.parse(queryStr))
+
+    // Finding resource
+    let query = Bootcamp.find(JSON.parse(queryStr))
+
+    // Select fields
+    if (request.query.select) {
+        const fields = request.query.select.replace(",", " ")
+        query = query.select(fields)
+    }
+
+    // Sort
+    if (request.query.sort) {
+        const sortBy = request.query.sort.replace(",", " ")
+        query = query.sort(sortBy) 
+    }
+
+    // Page
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 1
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+    const total = await Bootcamp.countDocuments()
+    query = query.skip(startIndex).limit(limit)
+
+    // Executing query
     const bootcamps = await query
-    response.status(200).json({success: true, count: bootcamps.length, data: bootcamps})
+
+    // Pagination result
+    const pagination = {}
+
+    if (endIndex < total) {
+        pagination.next = {
+            page: page + 1,
+            limit
+        }
+    }
+
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page - 1,
+            limit
+        }
+    }
+
+    response.status(200).json({success: true, count: bootcamps.length, pagination, data: bootcamps})
 })
 
 // @description Get single bootcamp

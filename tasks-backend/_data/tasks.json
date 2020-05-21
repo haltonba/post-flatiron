@@ -1,0 +1,32 @@
+[
+    {
+        "description": "Bring coffee",
+        "cost": 3,
+        "requesterName": "John Doe",
+        "category": "delivery"
+    },
+    {
+        "description": "Ride to campus",
+        "cost": 2,
+        "requesterName": "Jane Low",
+        "category": "ride"
+    },
+    {
+        "description": "Do my laundry",
+        "cost": 3,
+        "requesterName": "Sam Youn",
+        "category": "laundry"
+    },
+    {
+        "description": "Clean room",
+        "cost": 2,
+        "requesterName": "Reese Witherspoon",
+        "category": "cleaning"
+    },
+    {
+        "description": "Bring weed",
+        "cost": 1,
+        "requesterName": "Antonio Brown",
+        "category": "delivery"
+    }
+]

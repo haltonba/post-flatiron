@@ -27,7 +27,7 @@ exports.getBootcamps = asyncHandler(async (request, response, next) => {
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
 
     // Finding resource
-    let query = Bootcamp.find(JSON.parse(queryStr))
+    let query = Bootcamp.find(JSON.parse(queryStr)).populate("courses")
 
     // Select fields
     if (request.query.select) {
@@ -43,7 +43,7 @@ exports.getBootcamps = asyncHandler(async (request, response, next) => {
 
     // Page
     const page = parseInt(request.query.page) || 1
-    const limit = parseInt(request.query.limit) || 1
+    const limit = parseInt(request.query.limit) || 10
     const startIndex = (page - 1) * limit
     const endIndex = page * limit
     const total = await Bootcamp.countDocuments()
@@ -118,11 +118,15 @@ exports.updateBootcamp = asyncHandler(async (request, response, next) => {
 // @access Private
 
 exports.deleteBootcamp = asyncHandler(async (request, response, next) => {
-    const bootcamp = await Bootcamp.findByIdAndDelete(request.params.id)
+    // const bootcamp = await Bootcamp.findByIdAndDelete(request.params.id)
+    const bootcamp = await Bootcamp.findById(request.params.id)
 
     if (!bootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${request.params.id}`, 404))
     }
+
+    await bootcamp.remove()
+
     response.status(200).json({success: true, data: {}})
 })
 

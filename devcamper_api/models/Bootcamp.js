@@ -129,7 +129,7 @@ BootcampSchema.pre("save", async function (next) {
     next()
 })
 
-// Delete courses from DB when bootcamp is deleted
+// Delete courses from DB when specific bootcamp is deleted
 BootcampSchema.pre("remove", async function (next) {
     await this.model("Course").deleteMany({bootcamp: this._id})
     next()

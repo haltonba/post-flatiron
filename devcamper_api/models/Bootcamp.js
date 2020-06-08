@@ -123,7 +123,7 @@ BootcampSchema.pre("save", async function (next) {
         country: loc[0].countryCode
     }
 
-    // Do'nt save address in DB
+    // Don't save address in DB
     this.address = undefined
 
     next()

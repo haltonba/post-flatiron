@@ -27,8 +27,6 @@ for tweet in tweepy.Cursor(api.search, search_string).items(number_of_tweets):
     except StopIteration:
         break
 
-
-
 # Follow logic
 
 # for follower in limit_handler(tweepy.Cursor(api.followers).items()):
